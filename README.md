@@ -1,4 +1,6 @@
 # EYE
+
+STATUS: PROTOTYPE DO NOT USE
 EYE is my personal photo app. It has a few tweaks that are specifically designed for my own particular neurology.
 
 ## Flip / Pause
