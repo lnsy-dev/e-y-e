@@ -32,15 +32,11 @@ class EYE extends HTMLElement {
     this.constraints = document.createElement('eye-controls')
     this.constraints_el.appendChild(this.constraints)
     this.constraints.addEventListener('UPDATE FILTER', (e) => {
-      console.log(e.detail, this.video)
       this.video.style.filter = e.detail
     })
     this.appendChild(this.details)
 
     // Video
-
-    this.audio_constraints = {}
-    this.video_constraints = {}
 
     this.video = document.createElement('video')
     this.video.onloadedmetadata = (e) =>{
@@ -53,17 +49,20 @@ class EYE extends HTMLElement {
   }
 
   async getUserMedia(){
+    if(!this.audio_constraints && !this.video_constraints){
+      this.video.pause()
+      return
+    }
     const audio = this.audio_constraints;
     const video = this.video_constraints;
     const stream = await navigator.mediaDevices.getUserMedia({ audio, video })
     this.video.srcObject = stream
+    this.video.play()
 
   }
 
   handleNewConstraints(new_constraints){
 
-    console.log(new_constraints)
-    console.log(this.video.srcObject)
   }
 
   handleAudioInputDeviceChange(new_id){
@@ -92,7 +91,10 @@ class EYE extends HTMLElement {
       this.getUserMedia()
       return
     } else if (!this.video_constraints){
-      this.video_constraints = {}
+      this.video_constraints = {
+        facingMode: "environment"
+
+      }
     }
     this.video_constraints.deviceId = new_id
     this.getUserMedia()
@@ -151,19 +153,19 @@ class EyeDevices extends HTMLElement {
       this.setAttribute('audio-input-device', audio_input_options[0].deviceId)
     }
 
-    if(audio_output_options.length){
-      const audio_output_label = document.createElement('label')
-      audio_output_label.innerHTML = 'Audio Output'
-      const audio_output_selector = document.createElement('select')
+    // if(audio_output_options.length){
+    //   const audio_output_label = document.createElement('label')
+    //   audio_output_label.innerHTML = 'Audio Output'
+    //   const audio_output_selector = document.createElement('select')
 
-      audio_output_selector.innerHTML = audio_output_options.map((device) => {return `<option value="${device.deviceId}">${device.label}</option>`}).join("") + '<option value="false">none</option>'
-      audio_output_label.appendChild(audio_output_selector)
-      this.appendChild(audio_output_label)
-      audio_output_selector.addEventListener('change', (e) => {
-        this.setAttribute('audio-output-device', e.target.value)
-      })
-      this.setAttribute('audio-output-device', audio_output_options[0].deviceId)
-    }
+    //   audio_output_selector.innerHTML = audio_output_options.map((device) => {return `<option value="${device.deviceId}">${device.label}</option>`}).join("") + '<option value="false">none</option>'
+    //   audio_output_label.appendChild(audio_output_selector)
+    //   this.appendChild(audio_output_label)
+    //   audio_output_selector.addEventListener('change', (e) => {
+    //     this.setAttribute('audio-output-device', e.target.value)
+    //   })
+    //   this.setAttribute('audio-output-device', audio_output_options[0].deviceId)
+    // }
   }
 
   static get observedAttributes() {
