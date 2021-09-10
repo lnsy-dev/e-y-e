@@ -57,6 +57,7 @@ class EYE extends HTMLElement {
     const video = this.video_constraints;
     const stream = await navigator.mediaDevices.getUserMedia({ audio, video })
     this.video.srcObject = stream
+    this.video.volume = 0
     this.video.play()
 
   }
@@ -218,9 +219,24 @@ class EyeControls extends HTMLElement {
       <input type="range" min="0" max="360" name="saturation">
     </label>
 
+    <label>
+      Flip
+      <input type="checkbox" name="flip">
+    </label>
+    <label>
+      Invert
+      <input type="checkbox" name="invert">
+    </label>
+
     `
 
     this.appendChild(this.form)
+
+    this.flip = document.createElement('form')
+    this.flip.innerHTML = `
+
+
+    `
 
 
     let mousedown = false
@@ -250,10 +266,11 @@ class EyeControls extends HTMLElement {
       settings[input.name] = input.value
     })
 
-    let filter_text = `brightness(${(settings.brightness / 100)}) contrast(${(settings.contrast / 100)}) hue-rotate(${settings.hue}deg) saturate(${settings.saturation / 100})
+    let filter_text = `brightness(${(settings.brightness / 100)}) contrast(${(settings.contrast / 100)}) hue-rotate(${settings.hue}deg) saturate(${settings.saturation / 100}) invert(${settings.invert === 'checked' ? 1 : 0})
     `
 
     dispatch('UPDATE FILTER', filter_text, this)
+    dispatch('UPDATE FLIPPED', settings.flip, this)
 
   }
 
@@ -270,5 +287,6 @@ class EyeControls extends HTMLElement {
 }
 
 customElements.define('eye-controls', EyeControls)
+
 
 
