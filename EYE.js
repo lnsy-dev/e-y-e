@@ -1,277 +1,192 @@
 
 
-
-
 class EYE extends HTMLElement {
-  connectedCallback(){
+  video_polling = false;
+  flipped = false;
+  eye_size = 768;
+  contrast = 0;
+  saturation = 1; 
+  brightness = 1;
+  
+  render() {
+    const initialize_button = document.createElement('button');
+    initialize_button.classList.add('initialize-button')
+    initialize_button.innerText = 'Connect';
+    initialize_button.addEventListener('click', (e) => {
+      this.openEYE();
+    });
+    this.appendChild(initialize_button);
+  }
 
-    this.details = document.createElement('details')
-    this.details.innerHTML = `<summary> </summary>`
+  createMenu(){
+    const menu_container = document.createElement('details');
+    const summary = document.createElement('summary');
+    menu_container.appendChild(summary);
+    this.menu = document.createElement('section');
+    menu_container.appendChild(this.menu);
+    this.appendChild(menu_container);
+  }
 
-    // Devices
-    this.devices_el = document.createElement('details')
-    this.devices_el.innerHTML = `<summary>Devices</summary>`
-    this.details.appendChild(this.devices_el)
-    this.devices = document.createElement('eye-devices')
-    this.devices_el.appendChild(this.devices)
-    this.devices.addEventListener('audio-input-device-changed', (e) => {
-      this.handleAudioInputDeviceChange(e.detail)
+  createFlipButton(){
+    const flip_button_label = document.createElement('label');
+    flip_button_label.innerText = 'Flip Image';
+    const flip_checkbox = document.createElement('input');
+    flip_checkbox.setAttribute('type', 'checkbox');
+    flip_button_label.appendChild(flip_checkbox);
+    this.menu.appendChild(flip_button_label);
+    flip_checkbox.addEventListener('click', (e) => {
+      this.scratch_canvas_context.translate(this.eye_size, 0);
+      this.scratch_canvas_context.scale(-1, 1);      
+    });
+  }
+
+  createContrastSlider(){
+    const contrast_slider_label = document.createElement('label');
+    contrast_slider_label.innerText = 'Contrast';
+    const contrast_slider = document.createElement('input');
+    contrast_slider.setAttribute('type', 'range');
+    contrast_slider.setAttribute('min', -100);
+    contrast_slider.setAttribute('max', 100);
+    contrast_slider.value = 0; 
+    contrast_slider_label.appendChild(contrast_slider);
+    this.menu.appendChild(contrast_slider_label);
+    contrast_slider.addEventListener('change', (e) => {
+      this.contrast = e.target.value / 100;
     })
-    this.devices.addEventListener('audio-output-device-changed', (e) => {
-      this.handleAudioOutputDeviceChange(e.detail)
+  }
 
-    })    
-    this.devices.addEventListener('video-input-device-changed', (e) => {
-      this.handleVideoInputDeviceChange(e.detail)
+  createSaturationSlider(){
+    const saturation_slider_label = document.createElement('label');
+    saturation_slider_label.innerText = 'Saturate';
+    const saturation_slider = document.createElement('input');
+    saturation_slider.setAttribute('type', 'range');
+    saturation_slider.setAttribute('min', -100);
+    saturation_slider.setAttribute('max', 100);
+    saturation_slider.value = 0; 
+    saturation_slider_label.appendChild(saturation_slider);
+    this.menu.appendChild(saturation_slider_label);
+    saturation_slider.addEventListener('change', (e) => {
+      this.saturation = e.target.value / 100;
     })
+  }
 
-    // Constraints
-    this.constraints_el = document.createElement('details')
-    this.constraints_el.innerHTML = `<summary>Controls</summary>`
-    this.details.appendChild(this.constraints_el)
-    this.constraints = document.createElement('eye-controls')
-    this.constraints_el.appendChild(this.constraints)
-    this.constraints.addEventListener('UPDATE FILTER', (e) => {
-      this.video.style.filter = e.detail
+  createBrightnessSlider(){
+    const Brightness_slider_label = document.createElement('label');
+    Brightness_slider_label.innerText = 'Brightness';
+    const Brightness_slider = document.createElement('input');
+    Brightness_slider.setAttribute('type', 'range');
+    Brightness_slider.setAttribute('min', -100);
+    Brightness_slider.setAttribute('max', 100);
+    Brightness_slider.value = 0; 
+    Brightness_slider_label.appendChild(Brightness_slider);
+    this.menu.appendChild(Brightness_slider_label);
+    Brightness_slider.addEventListener('change', (e) => {
+      this.Brightness = e.target.value / 100;
     })
-    this.appendChild(this.details)
-
-    // Video
-
-    this.video = document.createElement('video')
-    this.video.onloadedmetadata = (e) =>{
-      this.video.play()
-    }
-    this.appendChild(this.video)
-
-    this.getUserMedia()
-
   }
 
-  async getUserMedia(){
-    if(!this.audio_constraints && !this.video_constraints){
-      this.video.pause()
-      return
-    }
-    const audio = this.audio_constraints;
-    const video = this.video_constraints;
-    const stream = await navigator.mediaDevices.getUserMedia({ audio, video })
-    this.video.srcObject = stream
-    this.video.volume = 0
-    this.video.play()
 
-  }
-
-  handleNewConstraints(new_constraints){
-
-  }
-
-  handleAudioInputDeviceChange(new_id){
-    if(new_id === "false"){
-      this.audio_constraints = false
-      this.getUserMedia()
-      return
-    } else if (!this.audio_constraints){
-      this.audio_constraints = {}
-    }
-
-    this.audio_constraints.deviceId = new_id
-    this.getUserMedia()
-  }
-
-  handleAudioOutputDeviceChange(new_id){
-
-
-    this.getUserMedia()
-
-  } 
-
-  handleVideoInputDeviceChange(new_id){
-    if(new_id === "false"){
-      this.video_constraints = false
-      this.getUserMedia()
-      return
-    } else if (!this.video_constraints){
-      this.video_constraints = {
-        facingMode: "environment"
-
+  openEYE() {
+    this.innerHTML = ``;
+    this.scratch_canvas = document.createElement('canvas');
+    this.scratch_canvas.addEventListener('click', (e) => {
+      if (this.video_polling) {
+        this.pauseVideoPoll();
+      } else {
+        this.beginVideoPoll();
       }
-    }
-    this.video_constraints.deviceId = new_id
-    this.getUserMedia()
+    });
+    this.scratch_canvas.width = this.eye_size;
+    this.scratch_canvas.height = this.eye_size;
+    this.scratch_canvas_context = this.scratch_canvas.getContext('2d', { preserveDrawingBuffer: true });
+    this.appendChild(this.scratch_canvas);
+    this.video = document.createElement('video');
+    this.video.onloadedmetadata = (e) => {
+      this.video.play();
+    };
+    this.getUserMedia();
+
+    this.take_picture_button = document.createElement('button');
+    this.take_picture_button.classList.add('take-picture-button');
+    this.take_picture_button.innerText = 'Take Picture';
+    this.take_picture_button.addEventListener('click', (e)=>{
+      e.preventDefault();
+      this.takePicture();
+    });
+    this.appendChild(this.take_picture_button);
+    this.createMenu();
+    this.createFlipButton();
+    this.createContrastSlider();
+    this.createSaturationSlider();
+    this.createBrightnessSlider();
   }
 
-
-
-}
-
-customElements.define('e-y-e', EYE)
-
-
-
-
-
-
-class EyeDevices extends HTMLElement {
-  connectedCallback(){
-
-    this.showConnectedDevices()
+  async getJpeg() {
+    // Convert canvas to Blob and return it
+    const image_data = await new Promise(resolve => {
+      this.scratch_canvas.toBlob((blob) => {
+        resolve(blob);
+      }, "image/jpeg", 0.8);
+    });
+    return image_data;
   }
 
-  async showConnectedDevices(){
-    const connected_devices = [...await navigator.mediaDevices.enumerateDevices()]
-    let video_options = connected_devices
-      .filter((device) => device.kind === 'videoinput')
-     
-    let audio_input_options = connected_devices.filter((device) => device.kind === 'audioinput')
-
-    let audio_output_options = connected_devices.filter((device) => device.kind === 'audiooutput')
-
-    if(video_options.length){
-      const video_input_label = document.createElement('label')
-      video_input_label.innerHTML = `Video Input`
-      const video_selector = document.createElement('select')
-      video_selector.innerHTML = video_options.map((device) => {return `<option value="${device.deviceId}">${device.label}</option>`}).join("") + '<option value="false">none</option>'
-      video_input_label.appendChild(video_selector)
-      this.appendChild(video_input_label)
-      video_selector.addEventListener('change', (e) => {
-        this.setAttribute('video-input-device', e.target.value)
-      })
-      this.setAttribute('video-input-device', video_options[0].deviceId)
-    }
-
-    if(audio_input_options.length){
-      const audio_input_label = document.createElement('label')
-      audio_input_label.innerHTML = `Audio Input`
-      const audio_input_selector = document.createElement('select')
-
-      audio_input_selector.innerHTML = audio_input_options.map((device) => {return `<option value="${device.deviceId}">${device.label}</option>`}).join("")+ '<option value="false">none</option>'
-      audio_input_label.appendChild(audio_input_selector)
-      this.appendChild(audio_input_label)
-      audio_input_selector.addEventListener('change', (e) => {
-        this.setAttribute('audio-input-device', e.target.value)
-      })
-      this.setAttribute('audio-input-device', audio_input_options[0].deviceId)
-    }
-
-    // if(audio_output_options.length){
-    //   const audio_output_label = document.createElement('label')
-    //   audio_output_label.innerHTML = 'Audio Output'
-    //   const audio_output_selector = document.createElement('select')
-
-    //   audio_output_selector.innerHTML = audio_output_options.map((device) => {return `<option value="${device.deviceId}">${device.label}</option>`}).join("") + '<option value="false">none</option>'
-    //   audio_output_label.appendChild(audio_output_selector)
-    //   this.appendChild(audio_output_label)
-    //   audio_output_selector.addEventListener('change', (e) => {
-    //     this.setAttribute('audio-output-device', e.target.value)
-    //   })
-    //   this.setAttribute('audio-output-device', audio_output_options[0].deviceId)
-    // }
+  async getImageData(){
+    const image_data = await this.scratch_canvas.toDataURL('image/png');
+    return image_data
   }
 
-  static get observedAttributes() {
-    return ['audio-output-device', 'audio-input-device', 'video-input-device', 'video-output-device'];
+  async takePicture(){
+    const img = await this.getJpeg();
+    console.log(img);
+    this.dispatchEvent(new CustomEvent('NEW PICTURE', {
+      detail: img
+    }));
   }
 
-  attributeChangedCallback(name, old_value, new_value){
-    switch(name){
-      case "audio-input-device":
-        dispatch('audio-input-device-changed', new_value, this)
-        break
-      case "audio-output-device":
-        dispatch('audio-output-device-changed', new_value, this)
-        break
-      case "video-input-device":
-        dispatch('video-input-device-changed', new_value, this)
-        break
-      default:
-    }
-  }
-
-}
-
-customElements.define('eye-devices', EyeDevices)
-
-
-
-
-
-class EyeControls extends HTMLElement {
-  connectedCallback(){
-    this.form = document.createElement('form')
-    this.form.innerHTML = `
-    <label>
-      brightness
-      <input type="range" min="0" max="400" name="brightness">
-    </label>
-    <label>
-      Contrast
-      <input type="range" min="0" max="200" name="contrast">
-    </label>
-
-    <label>
-      Hue
-      <input type="range" min="0" max="360" name="hue">
-    </label>
-
-    <label>
-      Saturation
-      <input type="range" min="0" max="360" name="saturation">
-    </label>
-
-    <label>
-      Flip
-      <input type="checkbox" name="flip">
-    </label>
-    <label>
-      Invert
-      <input type="checkbox" name="invert">
-    </label>
-
-    `
-
-    this.appendChild(this.form)
-
-    this.flip = document.createElement('form')
-    this.flip.innerHTML = `
-
-
-    `
-
-
-    let mousedown = false
-    this.form.addEventListener('mousedown', (e) => {
-      mousedown = true
-    })
-
-    document.body.addEventListener('mouseup', (e) => {
-      mousedown = false
-    })
-
-    this.form.addEventListener('mousemove', (e) => {
-      if(mousedown){
-        this.handleSettings()
+  async getUserMedia() {
+    const constraints = {
+      video: { deviceId: this.selected_device, 
+        width: this.eye_size,
+        height: this.eye_size 
       }
-    })    
+    };
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      this.video.srcObject = stream;
+      this.video.volume = 0;
+      this.video.play();
+      this.beginVideoPoll();
+    } catch (error) {
+      console.error('Error accessing user media:', error);
+    }
+  }
 
-    this.form.addEventListener('change', (e) => {
-      this.handleSettings(e)
-    })
+  async beginVideoPoll() {
+    this.video_polling = true;
+    this.video_poll = setInterval(() => this.pollVideo(), 250);
+  }
+
+  pauseVideoPoll() {
+    this.video_polling = false;
+    clearInterval(this.video_poll);
+  }
+
+  async pollVideo() {
+    await this.scratch_canvas_context.drawImage(this.video, 0, 0, this.eye_size, this.eye_size);
+    const img_data = await this.getImageData();
+    // this.image_processor.processImage(img_data, this.eye_size, this.eye_size)
+    // console.log(img_data);
 
   }
 
-  handleSettings(){
-    let settings = {};
-    [...this.form.querySelectorAll('input')].forEach(input => {
-      settings[input.name] = input.value
-    })
 
-    let filter_text = `brightness(${(settings.brightness / 100)}) contrast(${(settings.contrast / 100)}) hue-rotate(${settings.hue}deg) saturate(${settings.saturation / 100}) invert(${settings.invert === 'checked' ? 1 : 0})
-    `
+  async initialize(){
+    this.openEYE();
+  }
 
-    dispatch('UPDATE FILTER', filter_text, this)
-    dispatch('UPDATE FLIPPED', settings.flip, this)
-
+  connectedCallback(){
+    this.render();
   }
 
   static get observedAttributes() {
@@ -283,10 +198,6 @@ class EyeControls extends HTMLElement {
       default:
     }
   }
-
 }
 
-customElements.define('eye-controls', EyeControls)
-
-
-
+customElements.define('e-y-e', EYE)

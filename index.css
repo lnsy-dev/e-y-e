@@ -1,0 +1,53 @@
+e-y-e {
+  display: block;
+  position: relative;
+  min-height: 3em;
+  resize: horizontal;
+  overflow: auto;
+  aspect-ratio: 1;
+}
+
+e-y-e canvas {
+  width: 100%;
+  height: auto;
+}
+
+e-y-e .initialize-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+e-y-e .take-picture-button {
+  position: absolute;
+  bottom: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+e-y-e details {
+  position: absolute;
+  z-index:1;
+  left: 1em;
+  top: 1em;
+  cursor: pointer;
+}
+
+e-y-e details section label {
+  cursor: pointer;
+  display: flex;
+  padding: 1em;
+}
+
+e-y-e details section label input {
+  margin-left: auto;
+}
+
+
+e-y-e details section {
+  padding: 1em;
+  background-color: rgba(0,0,0,0.8);
+  color: white;
+}
