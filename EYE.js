@@ -109,9 +109,11 @@ class EYE extends HTMLElement {
   }
 
   createResetButton(){
+    const reset_button_label = document.createElement('label');
     const reset_button = document.createElement('button');
     reset_button.innerText = 'Reset'
-    this.menu.appendChild(reset_button);
+    reset_button_label.appendChild(reset_button);
+    this.menu.appendChild(reset_button_label);
     reset_button.addEventListener('click', (e)=>{
       this.contrast_slider.value = 100;
       this.brightness_slider.value = 100;
@@ -128,7 +130,7 @@ class EYE extends HTMLElement {
 
   async createSelectedDeviceDropdown(){
     const connected_devices = [...await navigator.mediaDevices.enumerateDevices()].filter(d => d.kind === 'videoinput');
-    console.log(connected_devices);
+    const selection_label = document.createElement('label');
     const video_inputs = document.createElement('select');
     for (let device_index in connected_devices) {
       const device = connected_devices[device_index];
@@ -142,7 +144,22 @@ class EYE extends HTMLElement {
       console.log(this.selected_device);
       this.getUserMedia();
     });
-    this.menu.appendChild(video_inputs);
+    selection_label.appendChild(video_inputs);
+    this.menu.appendChild(selection_label);
+  }
+
+  createTakePictureButton(){
+    const take_picture_label = document.createElement('label');
+    this.take_picture_button = document.createElement('button');
+    this.take_picture_button.classList.add('take-picture-button');
+    this.take_picture_button.innerText = 'Take Picture';
+    this.take_picture_button.addEventListener('click', (e)=>{
+      e.preventDefault();
+      this.takePicture();
+    });
+
+    take_picture_label.appendChild(this.take_picture_button);
+    this.menu.appendChild(take_picture_label);
   }
 
 
@@ -174,14 +191,6 @@ class EYE extends HTMLElement {
     };
     this.getUserMedia();
 
-    this.take_picture_button = document.createElement('button');
-    this.take_picture_button.classList.add('take-picture-button');
-    this.take_picture_button.innerText = 'Take Picture';
-    this.take_picture_button.addEventListener('click', (e)=>{
-      e.preventDefault();
-      this.takePicture();
-    });
-    this.appendChild(this.take_picture_button);
     this.createMenu();
     this.createFlipButton();
     this.createContrastSlider();
@@ -190,6 +199,7 @@ class EYE extends HTMLElement {
     this.createhueSlider();
     this.createResetButton();
     this.createSelectedDeviceDropdown();
+    this.createTakePictureButton();
   }
 
   async getJpeg() {
