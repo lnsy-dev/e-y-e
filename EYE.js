@@ -46,13 +46,15 @@ class EYE extends HTMLElement {
     const contrast_slider = document.createElement('input');
     contrast_slider.setAttribute('type', 'range');
     contrast_slider.setAttribute('min', 0);
-    contrast_slider.setAttribute('max', 200);
+    contrast_slider.setAttribute('max', 300);
     contrast_slider.value = 100; 
     contrast_slider_label.appendChild(contrast_slider);
     this.menu.appendChild(contrast_slider_label);
     contrast_slider.addEventListener('change', (e) => {
       this.contrast = e.target.value;
-    })
+    });
+
+    this.contrast_slider = contrast_slider;
   }
 
   createSaturationSlider(){
@@ -61,13 +63,14 @@ class EYE extends HTMLElement {
     const saturation_slider = document.createElement('input');
     saturation_slider.setAttribute('type', 'range');
     saturation_slider.setAttribute('min', 0);
-    saturation_slider.setAttribute('max', 200);
+    saturation_slider.setAttribute('max', 300);
     saturation_slider.value = 100; 
     saturation_slider_label.appendChild(saturation_slider);
     this.menu.appendChild(saturation_slider_label);
     saturation_slider.addEventListener('change', (e) => {
       this.saturation = e.target.value;
-    })
+    });
+    this.saturation_slider = saturation_slider;
   }
 
   createBrightnessSlider(){
@@ -76,13 +79,15 @@ class EYE extends HTMLElement {
     const Brightness_slider = document.createElement('input');
     Brightness_slider.setAttribute('type', 'range');
     Brightness_slider.setAttribute('min', 0);
-    Brightness_slider.setAttribute('max', 200);
+    Brightness_slider.setAttribute('max', 300);
     Brightness_slider.value = 100; 
     Brightness_slider_label.appendChild(Brightness_slider);
     this.menu.appendChild(Brightness_slider_label);
     Brightness_slider.addEventListener('change', (e) => {
       this.brightness = e.target.value;
-    })
+    });
+
+    this.brightness_slider = Brightness_slider
   }
 
   createhueSlider(){
@@ -92,12 +97,33 @@ class EYE extends HTMLElement {
     hue_slider.setAttribute('type', 'range');
     hue_slider.setAttribute('min', 0);
     hue_slider.setAttribute('max', 360);
-    hue_slider.value = 100; 
+    hue_slider.value = 180; 
     hue_slider_label.appendChild(hue_slider);
     this.menu.appendChild(hue_slider_label);
     hue_slider.addEventListener('change', (e) => {
       this.hue = e.target.value;
-    })
+    });
+
+    this.hue_slider = hue_slider
+  }
+
+  createResetButton(){
+    const reset_button = document.createElement('button');
+    reset_button.innerText = 'Reset'
+    this.menu.appendChild(reset_button);
+    reset_button.addEventListener('click', (e)=>{
+      this.contrast_slider.value = 100;
+      this.brightness_slider.value = 100;
+      this.saturation_slider.value = 100;
+      this.hue_slider.value = 0;
+
+      this.contrast = 100;
+      this.saturation = 100; 
+      this.brightness = 100;
+      this.hue = 0;
+
+    });
+
   }
 
 
@@ -143,6 +169,7 @@ class EYE extends HTMLElement {
     this.createSaturationSlider();
     this.createBrightnessSlider();
     this.createhueSlider();
+    this.createResetButton();
   }
 
   async getJpeg() {
