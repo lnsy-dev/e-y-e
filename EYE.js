@@ -189,7 +189,6 @@ class EYE extends HTMLElement {
 
   async takePicture(){
     const img = await this.getJpeg();
-    console.log(img);
     this.dispatchEvent(new CustomEvent('NEW PICTURE', {
       detail: img
     }));
@@ -224,17 +223,10 @@ class EYE extends HTMLElement {
   }
 
   async pollVideo() {
-
     await this.scratch_canvas_context.drawImage(this.video, 0, 0, this.eye_size, this.eye_size);
     this.scratch_canvas_context.filter = `saturate(${this.saturation}%) brightness(${this.brightness}%) contrast(${this.contrast}%) hue-rotate(${this.hue}deg)`
     const img_data = await this.scratch_canvas_context.getImageData(0,0,this.eye_size, this.eye_size);
-    // const contrasted_image = contrastImage(img_data, this.contrast);
-    // const saturated_image = saturateImage(contrasted_image, this.saturation);
     this.final_canvas_context.putImageData(img_data, 0, 0);
-
-    // this.image_processor.processImage(img_data, this.eye_size, this.eye_size)
-    // console.log(img_data);
-
   }
 
 
@@ -244,6 +236,17 @@ class EYE extends HTMLElement {
 
   connectedCallback(){
     this.render();
+  }
+
+  disconnectedCallback(){
+    // Stop video polling
+    this.pauseVideoPoll();
+    // Stop the media tracks
+    if (this.video && this.video.srcObject) {
+      let tracks = this.video.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
+      this.video.srcObject = null;
+    }
   }
 
   static get observedAttributes() {

@@ -1,7 +1,11 @@
 e-y-e {
   display: block;
   position: relative;
-  min-height: 3em;
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: 100vh;
+  margin: auto;
   resize: horizontal;
   overflow: auto;
   aspect-ratio: 1;
