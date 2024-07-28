@@ -19,6 +19,16 @@ class EYE extends HTMLElement {
     this.appendChild(initialize_button);
   }
 
+  drawLine(startX, startY, endX, endY, lineWidth = 1, strokeStyle = 'red'){
+    const ctx = this.final_canvas_context;
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = strokeStyle;
+    ctx.stroke();
+  }
+
   createMenu(){
     const menu_container = document.createElement('details');
     const summary = document.createElement('summary');
@@ -267,6 +277,9 @@ class EYE extends HTMLElement {
     this.scratch_canvas_context.filter = `saturate(${this.saturation}%) brightness(${this.brightness}%) contrast(${this.contrast}%) hue-rotate(${this.hue}deg)`
     const img_data = await this.scratch_canvas_context.getImageData(0,0,this.eye_size, this.eye_size);
     this.final_canvas_context.putImageData(img_data, 0, 0);
+    this.dispatchEvent(new CustomEvent("IMAGE DRAWN", {
+      detail: img_data
+    }));
   }
 
 
