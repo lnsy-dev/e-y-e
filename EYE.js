@@ -1,12 +1,12 @@
 
-
 class EYE extends HTMLElement {
   video_polling = false;
   flipped = false;
   eye_size = 768;
-  contrast = 0;
-  saturation = 1; 
-  brightness = 1;
+  contrast = 100;
+  saturation = 100; 
+  brightness = 100;
+  hue = 0;
   
   render() {
     const initialize_button = document.createElement('button');
@@ -45,13 +45,13 @@ class EYE extends HTMLElement {
     contrast_slider_label.innerText = 'Contrast';
     const contrast_slider = document.createElement('input');
     contrast_slider.setAttribute('type', 'range');
-    contrast_slider.setAttribute('min', -100);
-    contrast_slider.setAttribute('max', 100);
-    contrast_slider.value = 0; 
+    contrast_slider.setAttribute('min', 0);
+    contrast_slider.setAttribute('max', 200);
+    contrast_slider.value = 100; 
     contrast_slider_label.appendChild(contrast_slider);
     this.menu.appendChild(contrast_slider_label);
     contrast_slider.addEventListener('change', (e) => {
-      this.contrast = e.target.value / 100;
+      this.contrast = e.target.value;
     })
   }
 
@@ -60,13 +60,13 @@ class EYE extends HTMLElement {
     saturation_slider_label.innerText = 'Saturate';
     const saturation_slider = document.createElement('input');
     saturation_slider.setAttribute('type', 'range');
-    saturation_slider.setAttribute('min', -100);
-    saturation_slider.setAttribute('max', 100);
-    saturation_slider.value = 0; 
+    saturation_slider.setAttribute('min', 0);
+    saturation_slider.setAttribute('max', 200);
+    saturation_slider.value = 100; 
     saturation_slider_label.appendChild(saturation_slider);
     this.menu.appendChild(saturation_slider_label);
     saturation_slider.addEventListener('change', (e) => {
-      this.saturation = e.target.value / 100;
+      this.saturation = e.target.value;
     })
   }
 
@@ -75,15 +75,31 @@ class EYE extends HTMLElement {
     Brightness_slider_label.innerText = 'Brightness';
     const Brightness_slider = document.createElement('input');
     Brightness_slider.setAttribute('type', 'range');
-    Brightness_slider.setAttribute('min', -100);
-    Brightness_slider.setAttribute('max', 100);
-    Brightness_slider.value = 0; 
+    Brightness_slider.setAttribute('min', 0);
+    Brightness_slider.setAttribute('max', 200);
+    Brightness_slider.value = 100; 
     Brightness_slider_label.appendChild(Brightness_slider);
     this.menu.appendChild(Brightness_slider_label);
     Brightness_slider.addEventListener('change', (e) => {
-      this.Brightness = e.target.value / 100;
+      this.brightness = e.target.value;
     })
   }
+
+  createhueSlider(){
+    const hue_slider_label = document.createElement('label');
+    hue_slider_label.innerText = 'hue';
+    const hue_slider = document.createElement('input');
+    hue_slider.setAttribute('type', 'range');
+    hue_slider.setAttribute('min', 0);
+    hue_slider.setAttribute('max', 360);
+    hue_slider.value = 100; 
+    hue_slider_label.appendChild(hue_slider);
+    this.menu.appendChild(hue_slider_label);
+    hue_slider.addEventListener('change', (e) => {
+      this.hue = e.target.value;
+    })
+  }
+
 
 
   openEYE() {
@@ -99,7 +115,14 @@ class EYE extends HTMLElement {
     this.scratch_canvas.width = this.eye_size;
     this.scratch_canvas.height = this.eye_size;
     this.scratch_canvas_context = this.scratch_canvas.getContext('2d', { preserveDrawingBuffer: true });
-    this.appendChild(this.scratch_canvas);
+    // this.appendChild(this.scratch_canvas);
+    // 
+    this.final_canvas = document.createElement('canvas');
+    this.final_canvas.width = this.eye_size;
+    this.final_canvas.height = this.eye_size;
+    this.final_canvas_context = this.final_canvas.getContext('2d', { preserveDrawingBuffer: true });
+    this.appendChild(this.final_canvas);
+
     this.video = document.createElement('video');
     this.video.onloadedmetadata = (e) => {
       this.video.play();
@@ -119,6 +142,7 @@ class EYE extends HTMLElement {
     this.createContrastSlider();
     this.createSaturationSlider();
     this.createBrightnessSlider();
+    this.createhueSlider();
   }
 
   async getJpeg() {
@@ -173,8 +197,14 @@ class EYE extends HTMLElement {
   }
 
   async pollVideo() {
+
     await this.scratch_canvas_context.drawImage(this.video, 0, 0, this.eye_size, this.eye_size);
-    const img_data = await this.getImageData();
+    this.scratch_canvas_context.filter = `saturate(${this.saturation}%) brightness(${this.brightness}%) contrast(${this.contrast}%) hue-rotate(${this.hue}deg)`
+    const img_data = await this.scratch_canvas_context.getImageData(0,0,this.eye_size, this.eye_size);
+    // const contrasted_image = contrastImage(img_data, this.contrast);
+    // const saturated_image = saturateImage(contrasted_image, this.saturation);
+    this.final_canvas_context.putImageData(img_data, 0, 0);
+
     // this.image_processor.processImage(img_data, this.eye_size, this.eye_size)
     // console.log(img_data);
 
