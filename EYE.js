@@ -7,6 +7,7 @@ class EYE extends HTMLElement {
   saturation = 100; 
   brightness = 100;
   hue = 0;
+  selected_device = null;
   
   render() {
     const initialize_button = document.createElement('button');
@@ -123,7 +124,25 @@ class EYE extends HTMLElement {
       this.hue = 0;
 
     });
+  }
 
+  async createSelectedDeviceDropdown(){
+    const connected_devices = [...await navigator.mediaDevices.enumerateDevices()].filter(d => d.kind === 'videoinput');
+    console.log(connected_devices);
+    const video_inputs = document.createElement('select');
+    for (let device_index in connected_devices) {
+      const device = connected_devices[device_index];
+      const option = document.createElement('option');
+      option.setAttribute('value', device.deviceId);
+      option.innerText = device.label || `Camera ${parseInt(device_index) + 1}`;
+      video_inputs.appendChild(option);
+    }
+    video_inputs.addEventListener('change', (e) => {
+      this.selected_device = e.target.value;
+      console.log(this.selected_device);
+      this.getUserMedia();
+    });
+    this.menu.appendChild(video_inputs);
   }
 
 
@@ -170,6 +189,7 @@ class EYE extends HTMLElement {
     this.createBrightnessSlider();
     this.createhueSlider();
     this.createResetButton();
+    this.createSelectedDeviceDropdown();
   }
 
   async getJpeg() {
@@ -195,6 +215,7 @@ class EYE extends HTMLElement {
   }
 
   async getUserMedia() {
+    this.stopVideoStream()
     const constraints = {
       video: { deviceId: this.selected_device, 
         width: this.eye_size,
@@ -238,15 +259,19 @@ class EYE extends HTMLElement {
     this.render();
   }
 
-  disconnectedCallback(){
-    // Stop video polling
-    this.pauseVideoPoll();
-    // Stop the media tracks
+  stopVideoStream(){
     if (this.video && this.video.srcObject) {
       let tracks = this.video.srcObject.getTracks();
       tracks.forEach(track => track.stop());
       this.video.srcObject = null;
     }
+  }
+
+  disconnectedCallback(){
+    // Stop video polling
+    this.pauseVideoPoll();
+    // Stop the media tracks
+    this.stopVideoStream();
   }
 
   static get observedAttributes() {
