@@ -18,14 +18,40 @@
   </style>
 </head>
 <body>
-<e-y-e resize id="e_y_e"></e-y-e>
+<e-y-e resize id="e_y_e" qr-code-reader=true></e-y-e>
 <div id="film_roll"></div>
 <script>
-  e_y_e.addEventListener('NEW PICTURE', (e) => {
+  const eyeElement = document.getElementById('e_y_e');
+  const film_roll = document.getElementById('film_roll');
+
+  eyeElement.addEventListener('NEW PICTURE', (e) => {
     const img = new Image();
     const img_data = URL.createObjectURL(e.detail);
     img.src = img_data;
     film_roll.prepend(img);
+  });
+
+  eyeElement.addEventListener('qr-code-scanned', (e) => {
+    const qrData = e.detail.data;
+
+    // Play sound
+    const audio = new Audio('assets/qr-code-read.wav');
+    audio.play();
+
+    // Show dialog
+    let dialog = document.querySelector('dialog');
+    if (!dialog) {
+      dialog = document.createElement('dialog');
+      document.body.appendChild(dialog);
+    }
+    dialog.innerText = qrData;
+    dialog.showModal();
+
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    });
   });
 </script>
 </body>
