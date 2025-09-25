@@ -37,6 +37,66 @@ The component will request a camera feed that matches these dimensions.
 
 If only one attribute (`width` or `height`) is provided, the component will create a square canvas of that dimension. If neither is provided, it will default to a `768x768` pixel canvas.
 
+## Camera Controls
+
+You can control the camera's visual settings directly through attributes on the `<e-y-e>` element. This allows you to configure the component declaratively in your HTML. The component will automatically update when these attributes are changed.
+
+### Menu
+
+-   **Attribute:** `menu`
+-   **Description:** Controls the visibility of the settings menu.
+-   **Usage:** Set `menu="true"` to display the menu. If the attribute is absent, the menu will be hidden.
+
+### Image Flipping
+
+-   **Attribute:** `flipped`
+-   **Description:** Flips the camera feed horizontally.
+-   **Values:** `"true"` or `"false"`.
+-   **Default:** `"false"`.
+
+### Color and Filter Controls
+
+-   **Attribute:** `contrast`
+-   **Description:** Adjusts the contrast of the video.
+-   **Values:** A number from `0` to `300`.
+-   **Default:** `100`.
+
+-   **Attribute:** `saturation`
+-   **Description:** Adjusts the color saturation of the video.
+-   **Values:** A number from `0` to `300`.
+-   **Default:** `100`.
+
+-   **Attribute:** `brightness`
+-   **Description:** Adjusts the brightness of the video.
+-   **Values:** A number from `0` to `300`.
+-   **Default:** `100`.
+
+-   **Attribute:** `hue`
+-   **Description:** Adjusts the hue rotation of the video.
+-   **Values:** A number from `0` to `360` (degrees).
+-   **Default:** `0`.
+
+### Device Selection
+
+-   **Attribute:** `selected-device`
+-   **Description:** Specifies the camera to use by its `deviceId`.
+-   **Values:** A valid `deviceId` string.
+-   **Default:** The browser's default video input device.
+
+### Example
+
+Here is an example of an `<e-y-e>` element configured with several attributes:
+
+```html
+<e-y-e
+  width="50vw"
+  menu="true"
+  flipped="true"
+  contrast="150"
+  brightness="110"
+></e-y-e>
+```
+
 ## QR Code Reader
 
 The `e-y-e` component includes a QR code reader that can be enabled to detect and decode QR codes from the video stream.

@@ -239,7 +239,7 @@ export class EYE extends HTMLElement {
    * @memberof EYE
    */
   static get observedAttributes() {
-    return ['qr-code-reader', 'width', 'height'];
+    return ['qr-code-reader', 'width', 'height', 'menu', 'flipped', 'contrast', 'saturation', 'brightness', 'hue', 'selected-device'];
   }
 
   /**
@@ -266,6 +266,36 @@ export class EYE extends HTMLElement {
       if (new_value) {
         this.style[name] = isNaN(new_value) ? new_value : `${new_value}px`;
       }
+    }
+    if (name === 'menu') {
+        const menu = this.querySelector('.e-y-e-menu');
+        if (menu) {
+            menu.style.display = new_value === 'true' ? '' : 'none';
+        }
+    }
+    if (name === 'flipped') {
+        this.flipped = new_value === 'true';
+        if (this.flip_checkbox) this.flip_checkbox.checked = this.flipped;
+    }
+    if (name === 'contrast') {
+        this.contrast = new_value;
+        if (this.contrast_slider) this.contrast_slider.value = new_value;
+    }
+    if (name === 'saturation') {
+        this.saturation = new_value;
+        if (this.saturation_slider) this.saturation_slider.value = new_value;
+    }
+    if (name === 'brightness') {
+        this.brightness = new_value;
+        if (this.brightness_slider) this.brightness_slider.value = new_value;
+    }
+    if (name === 'hue') {
+        this.hue = new_value;
+        if (this.hue_slider) this.hue_slider.value = new_value;
+    }
+    if (name === 'selected-device') {
+        this.selected_device = new_value;
+        this.getUserMedia();
     }
   }
 }

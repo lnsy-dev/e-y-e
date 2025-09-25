@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>E-Y-E</title>
-  <script type="module" src="./index.js"></script>
-  <link rel="stylesheet" type="text/css" href="./index.css">
+  <script type="module" src="./dist/e-y-e.min.js"></script>
   <style>
     #film_roll {
       width: 100%;
@@ -18,7 +17,7 @@
   </style>
 </head>
 <body>
-<e-y-e resize id="e_y_e" qr-code-reader=true></e-y-e>
+<e-y-e resize id="e_y_e" menu=true qr-code-reader=true></e-y-e>
 <div id="film_roll"></div>
 <script>
   const eyeElement = document.getElementById('e_y_e');

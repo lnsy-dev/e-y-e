@@ -11,11 +11,16 @@ import {
  */
 export function createMenu(eyeInstance) {
   const menu_container = document.createElement('details');
+  menu_container.classList.add('e-y-e-menu');
   const summary = document.createElement('summary');
   menu_container.appendChild(summary);
   eyeInstance.menu = document.createElement('section');
   menu_container.appendChild(eyeInstance.menu);
   eyeInstance.appendChild(menu_container);
+
+  if (eyeInstance.getAttribute('menu') !== 'true') {
+    menu_container.style.display = 'none';
+  }
 }
 
 /**
@@ -27,11 +32,13 @@ export function createFlipButton(eyeInstance) {
   flip_button_label.innerText = 'Flip Image';
   const flip_checkbox = document.createElement('input');
   flip_checkbox.setAttribute('type', 'checkbox');
+  flip_checkbox.checked = eyeInstance.getAttribute('flipped') === 'true';
   flip_button_label.appendChild(flip_checkbox);
   eyeInstance.menu.appendChild(flip_button_label);
   flip_checkbox.addEventListener('click', (e) => {
-    eyeInstance.flipped = e.target.checked;
+    eyeInstance.setAttribute('flipped', e.target.checked);
   });
+  eyeInstance.flip_checkbox = flip_checkbox;
 }
 
 /**
@@ -45,11 +52,11 @@ export function createContrastSlider(eyeInstance) {
   contrast_slider.setAttribute('type', 'range');
   contrast_slider.setAttribute('min', 0);
   contrast_slider.setAttribute('max', 300);
-  contrast_slider.value = 100;
+  contrast_slider.value = eyeInstance.getAttribute('contrast') || 100;
   contrast_slider_label.appendChild(contrast_slider);
   eyeInstance.menu.appendChild(contrast_slider_label);
-  contrast_slider.addEventListener('change', (e) => {
-    eyeInstance.contrast = e.target.value;
+  contrast_slider.addEventListener('input', (e) => {
+    eyeInstance.setAttribute('contrast', e.target.value);
   });
 
   eyeInstance.contrast_slider = contrast_slider;
@@ -66,11 +73,11 @@ export function createSaturationSlider(eyeInstance) {
   saturation_slider.setAttribute('type', 'range');
   saturation_slider.setAttribute('min', 0);
   saturation_slider.setAttribute('max', 300);
-  saturation_slider.value = 100;
+  saturation_slider.value = eyeInstance.getAttribute('saturation') || 100;
   saturation_slider_label.appendChild(saturation_slider);
   eyeInstance.menu.appendChild(saturation_slider_label);
-  saturation_slider.addEventListener('change', (e) => {
-    eyeInstance.saturation = e.target.value;
+  saturation_slider.addEventListener('input', (e) => {
+    eyeInstance.setAttribute('saturation', e.target.value);
   });
   eyeInstance.saturation_slider = saturation_slider;
 }
@@ -86,11 +93,11 @@ export function createBrightnessSlider(eyeInstance) {
   Brightness_slider.setAttribute('type', 'range');
   Brightness_slider.setAttribute('min', 0);
   Brightness_slider.setAttribute('max', 300);
-  Brightness_slider.value = 100;
+  Brightness_slider.value = eyeInstance.getAttribute('brightness') || 100;
   Brightness_slider_label.appendChild(Brightness_slider);
   eyeInstance.menu.appendChild(Brightness_slider_label);
-  Brightness_slider.addEventListener('change', (e) => {
-    eyeInstance.brightness = e.target.value;
+  Brightness_slider.addEventListener('input', (e) => {
+    eyeInstance.setAttribute('brightness', e.target.value);
   });
 
   eyeInstance.brightness_slider = Brightness_slider
@@ -107,11 +114,11 @@ export function createhueSlider(eyeInstance) {
   hue_slider.setAttribute('type', 'range');
   hue_slider.setAttribute('min', 0);
   hue_slider.setAttribute('max', 360);
-  hue_slider.value = 180;
+  hue_slider.value = eyeInstance.getAttribute('hue') || 0;
   hue_slider_label.appendChild(hue_slider);
   eyeInstance.menu.appendChild(hue_slider_label);
-  hue_slider.addEventListener('change', (e) => {
-    eyeInstance.hue = e.target.value;
+  hue_slider.addEventListener('input', (e) => {
+    eyeInstance.setAttribute('hue', e.target.value);
   });
 
   eyeInstance.hue_slider = hue_slider
@@ -128,16 +135,11 @@ export function createResetButton(eyeInstance) {
   reset_button_label.appendChild(reset_button);
   eyeInstance.menu.appendChild(reset_button_label);
   reset_button.addEventListener('click', (e) => {
-    eyeInstance.contrast_slider.value = 100;
-    eyeInstance.brightness_slider.value = 100;
-    eyeInstance.saturation_slider.value = 100;
-    eyeInstance.hue_slider.value = 0;
-
-    eyeInstance.contrast = 100;
-    eyeInstance.saturation = 100;
-    eyeInstance.brightness = 100;
-    eyeInstance.hue = 0;
-
+    eyeInstance.setAttribute('contrast', 100);
+    eyeInstance.setAttribute('brightness', 100);
+    eyeInstance.setAttribute('saturation', 100);
+    eyeInstance.setAttribute('hue', 0);
+    eyeInstance.setAttribute('flipped', false);
   });
 }
 
@@ -154,12 +156,13 @@ export async function createSelectedDeviceDropdown(eyeInstance) {
     const option = document.createElement('option');
     option.setAttribute('value', device.deviceId);
     option.innerText = device.label || `Camera ${parseInt(device_index) + 1}`;
+    if (eyeInstance.getAttribute('selected-device') === device.deviceId) {
+        option.selected = true;
+    }
     video_inputs.appendChild(option);
   }
   video_inputs.addEventListener('change', (e) => {
-    eyeInstance.selected_device = e.target.value;
-    console.log(eyeInstance.selected_device);
-    getUserMedia(eyeInstance);
+    eyeInstance.setAttribute('selected-device', e.target.value);
   });
   selection_label.appendChild(video_inputs);
   eyeInstance.menu.appendChild(selection_label);
