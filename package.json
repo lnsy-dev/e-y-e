@@ -2,7 +2,7 @@
   "name": "e-y-e",
   "version": "1.0.0",
   "description": "A personal photo app with image flipping, pausing, and a QR code reader, designed as a web component.",
-  "main": "index.js",
+  "main": "dist/e-y-e.min.js",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "start": "npx live-server"
@@ -21,15 +21,7 @@
   "author": "",
   "license": "Unlicense",
   "files": [
-    "index.js",
-    "EYE.js",
-    "canvas.js",
-    "image.js",
-    "ui.js",
-    "video.js",
-    "qr-code-reader.js",
-    "index.css",
-    "vendor/"
+    "dist/"
   ],
   "dependencies": {
     "babel-loader": "^9.1.3",
