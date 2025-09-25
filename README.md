@@ -19,6 +19,24 @@ EYE also broadcasts an "updated canvas" event every frame.
   <e-y-e target="target_eye"></e-y-e>
 ```
 
+## Sizing
+
+You can control the size of the `e-y-e` component by adding `width` and `height` attributes. These attributes accept standard CSS values, including pixels (`500px`), viewport units (`50vw`), or percentages (`100%`). If you provide a unitless value, it will be interpreted as pixels.
+
+The component will request a camera feed that matches these dimensions.
+
+**Examples:**
+
+```html
+<!-- Set a fixed size in pixels -->
+<e-y-e width="640" height="480"></e-y-e>
+
+<!-- Set the width to 80% of the viewport width and create a square canvas -->
+<e-y-e width="80vw"></e-y-e>
+```
+
+If only one attribute (`width` or `height`) is provided, the component will create a square canvas of that dimension. If neither is provided, it will default to a `768x768` pixel canvas.
+
 ## QR Code Reader
 
 The `e-y-e` component includes a QR code reader that can be enabled to detect and decode QR codes from the video stream.
