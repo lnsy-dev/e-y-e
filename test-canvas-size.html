@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>E-Y-E Canvas Size Test</title>
+  <script type="module" src="./index.js"></script>
+  <link rel="stylesheet" type="text/css" href="./index.css">
+  <style>
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    form {
+        margin: 20px;
+    }
+    #eye-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    e-y-e {
+        border: 1px solid black;
+    }
+    #film_roll {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #film_roll img {
+      max-width: 200px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Test E-Y-E Canvas Size</h1>
+
+<form id="size-form">
+  <label for="width">Width:</label>
+  <input type="text" id="width" name="width" value="300px">
+  <label for="height">Height:</label>
+  <input type="text" id="height" name="height" value="300px">
+  <button type="submit">Create E-Y-E</button>
+</form>
+
+<div id="eye-container"></div>
+<div id="film_roll"></div>
+
+<script>
+  document.getElementById('size-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const width = form.elements.width.value;
+    const height = form.elements.height.value;
+
+    const eyeContainer = document.getElementById('eye-container');
+    const eyeElement = document.createElement('e-y-e');
+
+    if (width) {
+      eyeElement.setAttribute('width', width);
+    }
+    if (height) {
+      eyeElement.setAttribute('height', height);
+    }
+    
+    eyeElement.setAttribute('qr-code-reader', 'true');
+
+    const film_roll = document.getElementById('film_roll');
+
+    eyeElement.addEventListener('NEW PICTURE', (e) => {
+      const img = new Image();
+      const img_data = URL.createObjectURL(e.detail);
+      img.src = img_data;
+      film_roll.prepend(img);
+    });
+
+    eyeElement.addEventListener('qr-code-scanned', (e) => {
+      const qrData = e.detail.data;
+
+      // Play sound
+      const audio = new Audio('assets/qr-code-read.wav');
+      audio.play();
+
+      // Show dialog
+      let dialog = document.querySelector('dialog');
+      if (!dialog) {
+        dialog = document.createElement('dialog');
+        document.body.appendChild(dialog);
+      }
+      dialog.innerText = qrData;
+      dialog.showModal();
+
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) {
+          dialog.close();
+        }
+      });
+    });
+
+    eyeContainer.appendChild(eyeElement);
+  });
+</script>
+
+</body>
+</html>

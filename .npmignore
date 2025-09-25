@@ -1,0 +1,9 @@
+dist
+node_modules
+webpack.config.js
+package-lock.json
+.gitignore
+prepros.config
+architecture.md
+README.md
+assets

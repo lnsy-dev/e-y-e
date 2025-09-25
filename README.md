@@ -1,6 +1,5 @@
 # EYE
 
-STATUS: PROTOTYPE DO NOT USE
 EYE is my personal photo app. It has a few tweaks that are specifically designed for my own particular neurology.
 
 ## Flip / Pause
@@ -95,3 +94,9 @@ This tutorial demonstrates how to:
 4.  Display the QR code data in a modal dialog.
 
 Make sure you have the `assets/qr-code-read.wav` sound file in your project for the audio notification to work.
+
+---
+
+## Prior Work
+
+The QR Scanning portion of this code is from https://github.com/nimiq/qr-scanner .

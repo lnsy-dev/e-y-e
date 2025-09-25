@@ -30,8 +30,7 @@ export function createFlipButton(eyeInstance) {
   flip_button_label.appendChild(flip_checkbox);
   eyeInstance.menu.appendChild(flip_button_label);
   flip_checkbox.addEventListener('click', (e) => {
-    eyeInstance.scratch_canvas_context.translate(eyeInstance.eye_size, 0);
-    eyeInstance.scratch_canvas_context.scale(-1, 1);
+    eyeInstance.flipped = e.target.checked;
   });
 }
 

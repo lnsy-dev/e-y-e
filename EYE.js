@@ -150,15 +150,32 @@ export class EYE extends HTMLElement {
         this.beginVideoPoll();
       }
     });
-    this.scratch_canvas.width = this.eye_size;
-    this.scratch_canvas.height = this.eye_size;
+    const widthAttr = this.getAttribute('width');
+    const heightAttr = this.getAttribute('height');
+    let canvasWidth = this.offsetWidth;
+    let canvasHeight = this.offsetHeight;
+
+    if (widthAttr && !heightAttr) {
+      canvasHeight = canvasWidth;
+    } else if (!widthAttr && heightAttr) {
+      canvasWidth = canvasHeight;
+    } else if (!widthAttr && !heightAttr) {
+      canvasWidth = this.eye_size;
+      canvasHeight = this.eye_size;
+    }
+
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
+
+    this.scratch_canvas.width = this.canvasWidth;
+    this.scratch_canvas.height = this.canvasHeight;
     this.scratch_canvas_context = this.scratch_canvas.getContext('2d', {
       preserveDrawingBuffer: true
     });
 
     this.final_canvas = document.createElement('canvas');
-    this.final_canvas.width = this.eye_size;
-    this.final_canvas.height = this.eye_size;
+    this.final_canvas.width = this.canvasWidth;
+    this.final_canvas.height = this.canvasHeight;
     this.final_canvas_context = this.final_canvas.getContext('2d', {
       preserveDrawingBuffer: true
     });
@@ -222,7 +239,7 @@ export class EYE extends HTMLElement {
    * @memberof EYE
    */
   static get observedAttributes() {
-    return ['qr-code-reader'];
+    return ['qr-code-reader', 'width', 'height'];
   }
 
   /**
@@ -243,6 +260,11 @@ export class EYE extends HTMLElement {
           this.qrCodeReader.destroy();
           this.qrCodeReader = null;
         }
+      }
+    }
+    if (name === 'width' || name === 'height') {
+      if (new_value) {
+        this.style[name] = isNaN(new_value) ? new_value : `${new_value}px`;
       }
     }
   }
